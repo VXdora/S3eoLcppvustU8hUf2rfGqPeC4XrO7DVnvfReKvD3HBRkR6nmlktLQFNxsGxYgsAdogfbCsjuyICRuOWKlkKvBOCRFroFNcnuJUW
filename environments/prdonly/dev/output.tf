@@ -1,0 +1,1 @@
+output "codecommit_role_for_prd_arn" { value = aws_iam_role.codecommit_role_for_prd.arn }
