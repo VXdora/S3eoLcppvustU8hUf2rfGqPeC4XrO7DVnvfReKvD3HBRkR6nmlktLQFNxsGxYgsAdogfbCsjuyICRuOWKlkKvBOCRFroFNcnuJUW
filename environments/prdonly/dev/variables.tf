@@ -8,3 +8,4 @@ variable "prd_account_id" { type = string }
 
 variable "s3_artifact_output_bucket_arn" { type = string }
 variable "kms_key_arn" { type = string }
+variable "event_bus_arn" { type = string }

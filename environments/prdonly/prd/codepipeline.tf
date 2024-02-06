@@ -131,59 +131,44 @@ resource "aws_codepipeline" "codepipeline" {
 #########################################
 #   EventBridge
 #########################################
-# resource "aws_iam_role" "eventbridge_to_codepipeline_role" {
-#   name = "${var.prd_env}-${var.pj_name}-eventbridge-to-codepipeline-role"
-#   assume_role_policy = <<EORP
-# {
-#     "Version": "2012-10-17",
-#     "Statement": [
-#         {
-#             "Sid": "AssumeRole",
-#             "Effect": "Allow",
-#             "Principal": {
-#                 "Service": "events.amazonaws.com"
-#             },
-#             "Action": "sts:AssumeRole"
-#         }
-#     ]
-# }
-# EORP
-#     inline_policy {
-#       name = "codepipeline"
-#       policy = <<EOPA
-# {
-#     "Version": "2012-10-17",
-#     "Statement": [
-#         {
-#             "Sid": "GrantPermissionCodepipeline",
-#             "Effect": "Allow",
-#             "Action": "codepipeline:StartPipelineExecution",
-#             "Resource": "${aws_codepipeline.codepipeline.arn}"
-#         }
-#     ]
-# }
-# EOPA
-#     }
-# }
-# 
-# resource "aws_cloudwatch_event_rule" "codepipeline_event_rule" {
-#   name = "${var.prd_env}-${var.pj_name}-codepipeline-event-rule"
-#   event_pattern = <<EOP
-# {
-#   "source": ["aws.codecommit"],
-#   "detail-type": ["CodeCommit Repository State Change"],
-#   "resources": ["${aws_codecommit_repository.codecommit_repository.arn}"],
-#   "detail": {
-#     "event": ["referenceCreated", "referenceUpdated"],
-#     "referenceType": ["branch"],
-#     "referenceName": ["${var.prd_branch_name}"]
-#   }
-# }
-# EOP
-# }
-# 
-# resource "aws_cloudwatch_event_target" "codepipeline_event_target" {
-#     rule = aws_cloudwatch_event_rule.codepipeline_event_rule.name
-#     arn = aws_codepipeline.codepipeline.arn
-#     role_arn = aws_iam_role.eventbridge_to_codepipeline_role.arn
-# }
+resource "aws_iam_role" "eventbridge_to_codepipeline_role" {
+  name = "${var.prd_env}-${var.pj_name}-eventbridge-to-codepipeline-role"
+  assume_role_policy = <<EORP
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "AssumeRole",
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "events.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+        }
+    ]
+}
+EORP
+    inline_policy {
+      name = "codepipeline"
+      policy = <<EOPA
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "GrantPermissionCodepipeline",
+            "Effect": "Allow",
+            "Action": "codepipeline:StartPipelineExecution",
+            "Resource": "${aws_codepipeline.codepipeline.arn}"
+        }
+    ]
+}
+EOPA
+    }
+}
+
+resource "aws_cloudwatch_event_target" "codepipeline_event_target" {
+    rule = aws_cloudwatch_event_rule.codepipeline_event_rule.name
+    arn = aws_codepipeline.codepipeline.arn
+    role_arn = aws_iam_role.eventbridge_to_codepipeline_role.arn
+    event_bus_name = aws_cloudwatch_event_bus.event_bus.name
+}

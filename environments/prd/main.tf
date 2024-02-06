@@ -40,6 +40,7 @@ module "resource-prdonly-dev" {
 
   s3_artifact_output_bucket_arn = module.resource-prdonly-prd.s3_artifact_output_bucket_arn
   kms_key_arn = module.resource-prdonly-prd.kms_key_arn
+  event_bus_arn = module.resource-prdonly-prd.event_bus_arn
 
   providers = {
     aws = aws.dev
